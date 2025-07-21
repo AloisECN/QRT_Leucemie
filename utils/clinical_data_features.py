@@ -7,7 +7,11 @@ def extract_cytogenetic_features(df):
     # -- Initialize new columns --
 
     # check if no abnormalities in chromosomes
-    df['is_normal'] = df['CYTOGENETICS'].fillna('').astype(str).str.startswith('46').astype(int)
+    df['46_chromo'] = df['CYTOGENETICS'].fillna('').astype(str).str.startswith('46').astype(int)
+    #Check if labeled as normal
+    df["is_normal"] = df['CYTOGENETICS'].fillna('').astype(str).str.startswith('Normal').astype(int)
+    #Check if labeled as abnormal
+    df["is_abnormal"] = df['CYTOGENETICS'].fillna('').astype(str).str.startswith('Abnormal').astype(int)
     # check if deletion in chromosomes
     df['has_deletion'] = df['CYTOGENETICS'].fillna('').astype(str).str.contains('del').astype(int)
     # check if translocation in chromosomes
@@ -21,6 +25,9 @@ def extract_cytogenetic_features(df):
     df['has_chr7_abnormal'] = df['CYTOGENETICS'].fillna('').astype(str).str.contains('-7|del\(7\)').astype(int)
     df['has_chr5_abnormal'] = df['CYTOGENETICS'].fillna('').astype(str).str.contains('-5|del\(5\)').astype(int)
     df['has_trisomy8'] = df['CYTOGENETICS'].fillna('').astype(str).str.contains('\+8').astype(int)
+    df['has_monosomy7'] = df['CYTOGENETICS'].fillna('').astype(str).str.contains(r'-7(?![0-9])').astype(int)
+    df['has_del7q'] = df['CYTOGENETICS'].fillna('').astype(str).str.contains(r'del\(7.*?q.*?\)').astype(int)
+
     
     # Count total abnormalities
     df['total_abnormalities'] = (
@@ -30,10 +37,29 @@ def extract_cytogenetic_features(df):
         df['has_addition'] +
         df['has_chr7_abnormal'] +
         df['has_chr5_abnormal'] +
-        df['has_trisomy8']
+        df['has_trisomy8'] +
+        df["has_monosomy7"] +
+        df["has_del7q"]
     )
+
+    df['has_high_risk_marker'] = (
+        df['has_chr7_abnormal'] |
+        df['has_chr5_abnormal'] |
+        df['has_trisomy8']
+    ).astype(int)
+
+
+    df['is_complex_karyotype'] = (df['total_abnormalities'] >= 3).astype(int)
+
+    df["len_of_cyto"] = df['CYTOGENETICS'].fillna('').apply(len)
+    df["n_karyotype_blocks"] = df['CYTOGENETICS'].fillna('').apply(lambda x: len(str(x).split('/')))
+
+    df['is_missing_cytogenetics'] = df['CYTOGENETICS'].isna().astype(int)
+
     
     return df
+
+
 
 
 
@@ -79,4 +105,10 @@ def add_severity_features(df):
         axis=1
     )
     
+    df['abnormal_cell_fraction_bin'] = pd.cut(
+        df['abnormal_cell_proportion'],
+        bins=[-0.01, 0.01, 0.25, 0.75, 1.0],
+        labels=[0, 1, 5, 10]
+    )
+
     return df
