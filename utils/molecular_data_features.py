@@ -14,7 +14,7 @@ low_impact = [
 ]
 
 
-def process_molecular_data_effect(df):
+def process_molecular_data_effect_bis(df):
     """
     Process molecular data to create features based on gene mutations.
 
@@ -26,9 +26,10 @@ def process_molecular_data_effect(df):
     """
 
     # Group by 'ID' and 'GENE', then count the occurrences of each gene for each ID
-    gene_counts = df.groupby(['ID', 'GENE']).size().unstack(fill_value=0)
+    #gene_counts = df.groupby(['ID', 'GENE']).size().unstack(fill_value=0)
     # Add a total mutation count for each ID
-    gene_counts['total_mutations'] = gene_counts.sum(axis=1)
+    #gene_counts['total_mutations'] = gene_counts.sum(axis=1)
+    gene_counts = df.groupby("ID")["GENE"].nunique().reset_index(name="total_mutations")
 
     # Create an impact score based on the effect of the mutation
     effect_scores = df.groupby("ID")["EFFECT_LEVEL"].sum().reset_index()
@@ -69,6 +70,46 @@ def process_molecular_data_effect(df):
     gene_counts = gene_counts.reset_index().merge(diff, on="ID").set_index("ID")
 
     return gene_counts
+
+def process_molecular_data_effect(df):
+    """
+    Process molecular data to create features based on gene mutations,
+    including HIGH_RISK and HOTSPOTS using user-defined functions.
+    """
+
+    genes_of_interest = ["TP53", "NPM1", "CEBPA", "FLT3", "ASXL1", "DNMT3A", "TET2", "IDH1", "IDH2", "RUNX1"]
+
+    # Appliquer les fonctions personnalisées
+    df["HIGH_RISK"] = df.apply(lambda x: is_high_risk(x["REF"], x["ALT"], x["PROTEIN_CHANGE"]), axis=1)
+    df["HOTSPOTS"] = df.apply(lambda x: has_hotspot_mutation(x["PROTEIN_CHANGE"]), axis=1)
+
+    # Agrégation par patient (ID)
+    gene_counts = df.groupby("ID").agg(
+        total_mutations=("GENE", "nunique"),        # nombre de gènes altérés distincts
+        effect_score=("EFFECT_LEVEL", "sum"),
+        max_VAF=("VAF", "max"),
+        mean_VAF=("VAF", "mean"),
+        max_DEPTH=("DEPTH", "max"),
+        mean_DEPTH=("DEPTH", "mean"),
+        HIGH_RISK=("HIGH_RISK", "sum"),             # somme des mutations high-risk
+        HOTSPOTS=("HOTSPOTS", "sum"),               # somme des hotspots
+        start_sum=("START", "sum"),
+        end_sum=("END", "sum")
+    )
+
+    # Calcul de la différence entre start et end
+    gene_counts["DIFF"] = gene_counts["end_sum"] - gene_counts["start_sum"]
+
+    # Supprimer les colonnes intermédiaires si pas nécessaires
+    gene_counts = gene_counts.drop(columns=["start_sum", "end_sum"])
+
+    gene_indicators = pd.crosstab(df["ID"], df["GENE"])
+    # Garder seulement ceux qui nous intéressent
+    gene_indicators = gene_indicators.reindex(columns=genes_of_interest, fill_value=0)
+    gene_counts = gene_counts.merge(gene_indicators, on="ID", how="left")
+
+    return gene_counts
+
 
 def process_molecular_data(df):
     """
