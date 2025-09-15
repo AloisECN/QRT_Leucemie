@@ -4,8 +4,6 @@ import re
 def extract_cytogenetic_features(df):
     """Extract features from cytogenetics column"""
     
-    # -- Initialize new columns --
-
     # check if no abnormalities in chromosomes
     df['46_chromo'] = df['CYTOGENETICS'].fillna('').astype(str).str.startswith('46').astype(int)
     #Check if labeled as normal
@@ -48,20 +46,10 @@ def extract_cytogenetic_features(df):
         df['has_trisomy8']
     ).astype(int)
 
-
-    df['is_complex_karyotype'] = (df['total_abnormalities'] >= 3).astype(int)
-
-    df["len_of_cyto"] = df['CYTOGENETICS'].fillna('').apply(len)
-    df["n_karyotype_blocks"] = df['CYTOGENETICS'].fillna('').apply(lambda x: len(str(x).split('/')))
-
     df['is_missing_cytogenetics'] = df['CYTOGENETICS'].isna().astype(int)
 
     
     return df
-
-
-
-
 
 def extract_cell_proportions(cytogenetics_str):
     """Extract the proportion of abnormal cells from cytogenetics string"""
