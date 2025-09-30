@@ -8,8 +8,6 @@ def extract_cytogenetic_features(df):
     df['46_chromo'] = df['CYTOGENETICS'].fillna('').astype(str).str.startswith('46').astype(int)
     #Check if labeled as normal
     df["is_normal"] = df['CYTOGENETICS'].fillna('').astype(str).str.startswith('Normal').astype(int)
-    #Check if labeled as abnormal
-    df["is_abnormal"] = df['CYTOGENETICS'].fillna('').astype(str).str.startswith('Abnormal').astype(int)
     # check if deletion in chromosomes
     df['has_deletion'] = df['CYTOGENETICS'].fillna('').astype(str).str.contains('del').astype(int)
     # check if translocation in chromosomes
@@ -48,7 +46,6 @@ def extract_cytogenetic_features(df):
 
     df['is_missing_cytogenetics'] = df['CYTOGENETICS'].isna().astype(int)
 
-    
     return df
 
 def extract_cell_proportions(cytogenetics_str):
@@ -98,5 +95,8 @@ def add_severity_features(df):
         bins=[-0.01, 0.01, 0.25, 0.75, 1.0],
         labels=[0, 1, 5, 10]
     )
+
+    df.drop(columns=["abnormal_cell_proportion"], inplace=True)
+    df.drop(columns=["abnormal_cell_count"], inplace=True)
 
     return df

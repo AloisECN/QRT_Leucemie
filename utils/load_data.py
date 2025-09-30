@@ -20,9 +20,9 @@ def load_target_dataset(path):
     target_df['OS_YEARS'] = pd.to_numeric(target_df['OS_YEARS'], errors='coerce')
 
     # Ensure 'OS_STATUS' is boolean
-    target_df['OS_STATUS'] = target_df['OS_STATUS'].astype(bool)
+    #target_df['OS_STATUS'] = target_df['OS_STATUS'].astype(bool)
 
     #we swap os_status and os_years
-    target_df['OS_STATUS'], target_df['OS_YEARS'] = target_df['OS_YEARS'], target_df['OS_STATUS']
+    #target_df['OS_STATUS'], target_df['OS_YEARS'] = target_df['OS_YEARS'], target_df['OS_STATUS']
 
     return target_df

@@ -65,9 +65,9 @@ def process_molecular_data_effect(df):
         total_mutations=("GENE", "nunique"),        # nombre de gènes altérés distincts
         effect_score=("EFFECT_LEVEL", "sum"),
         max_VAF=("VAF", "max"),
-        mean_VAF=("VAF", "mean"),
+        #mean_VAF=("VAF", "mean"),
         max_DEPTH=("DEPTH", "max"),
-        mean_DEPTH=("DEPTH", "mean"),
+        #mean_DEPTH=("DEPTH", "mean"),
         HIGH_RISK=("HIGH_RISK", "sum"),             # somme des mutations high-risk
         HOTSPOTS=("HOTSPOTS", "sum"),               # somme des hotspots
         start_sum=("START", "sum"),
