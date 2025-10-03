@@ -22,7 +22,4 @@ def load_target_dataset(path):
     # Ensure 'OS_STATUS' is boolean
     target_df['OS_STATUS'] = target_df['OS_STATUS'].astype(bool)
 
-    #we swap os_status and os_years
-    target_df['OS_STATUS'], target_df['OS_YEARS'] = target_df['OS_YEARS'], target_df['OS_STATUS']
-
     return target_df

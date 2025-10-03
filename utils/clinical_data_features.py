@@ -8,8 +8,6 @@ def extract_cytogenetic_features(df):
     df['46_chromo'] = df['CYTOGENETICS'].fillna('').astype(str).str.startswith('46').astype(int)
     #Check if labeled as normal
     df["is_normal"] = df['CYTOGENETICS'].fillna('').astype(str).str.startswith('Normal').astype(int)
-    #Check if labeled as abnormal
-    df["is_abnormal"] = df['CYTOGENETICS'].fillna('').astype(str).str.startswith('Abnormal').astype(int)
     # check if deletion in chromosomes
     df['has_deletion'] = df['CYTOGENETICS'].fillna('').astype(str).str.contains('del').astype(int)
     # check if translocation in chromosomes
@@ -87,16 +85,13 @@ def add_severity_features(df):
     # Calculate proportion of abnormal cells
     df['abnormal_cell_count'] = cell_counts.apply(lambda x: x[0])
     df['total_cell_count'] = cell_counts.apply(lambda x: x[1])
+
     df['abnormal_cell_proportion'] = df.apply(
         lambda row: row['abnormal_cell_count'] / row['total_cell_count'] 
         if row['total_cell_count'] > 0 else 0, 
         axis=1
     )
-    
-    df['abnormal_cell_fraction_bin'] = pd.cut(
-        df['abnormal_cell_proportion'],
-        bins=[-0.01, 0.01, 0.25, 0.75, 1.0],
-        labels=[0, 1, 5, 10]
-    )
 
+    df.drop(columns = ["abnormal_cell_count", "total_cell_count"], inplace = True)
+    
     return df

@@ -9,7 +9,6 @@ HB
 PLT
 46_chromo
 is_normal
-is_abnormal #A supprimer attention au abnormalities
 has_deletion
 has_translocation
 has_inversion
@@ -22,10 +21,7 @@ has_del7q
 total_abnormalities
 has_high_risk_marker
 is_missing_cytogenetics
-abnormal_cell_count
-total_cell_count
-abnormal_cell_proportion #Sers à rien car bin contient la donnée accentuée
-abnormal_cell_fraction_bin
+abnormal_cell_proportion
 total_mutations
 effect_score
 max_VAF

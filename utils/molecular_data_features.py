@@ -8,7 +8,7 @@ def classify_impact(effect):
     if effect in high_impact:
         impact = 10
     if effect in moderate_impact:
-        impact = 2
+        impact = 5
     return impact
 
 
