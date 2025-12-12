@@ -46,9 +46,7 @@ class MolecularDataFeature:
         "ASXL1",
         "DNMT3A",
         "TET2",
-        "IDH1",
-        "IDH2",
-        "RUNX1",
+        "RUNX1"
     ]
 
     def classify_impact(self, effect):

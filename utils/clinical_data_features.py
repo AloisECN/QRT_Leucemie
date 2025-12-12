@@ -34,25 +34,22 @@ class ClinicalDataFeatures:
         df["has_addition"] = cyto.str.contains("add").astype(int)
 
         df["has_chr7_abnormal"] = cyto.str.contains(r"-7|del\(7\)").astype(int)
-        df["has_chr5_abnormal"] = cyto.str.contains(r"-5|del\(5\)").astype(int)
         df["has_trisomy8"] = cyto.str.contains(r"\+8").astype(int)
         df["has_monosomy7"] = cyto.str.contains(r"-7(?![0-9])").astype(int)
-        df["has_del7q"] = cyto.str.contains(r"del\(7.*?q.*?\)").astype(int)
-
+        
         df["total_abnormalities"] = (
             df["has_deletion"]
             + df["has_translocation"]
             + df["has_inversion"]
             + df["has_addition"]
             + df["has_chr7_abnormal"]
-            + df["has_chr5_abnormal"]
             + df["has_trisomy8"]
             + df["has_monosomy7"]
-            + df["has_del7q"]
-        )
+                
+            )
 
         df["has_high_risk_marker"] = (
-            df["has_chr7_abnormal"] | df["has_chr5_abnormal"] | df["has_trisomy8"]
+            df["has_chr7_abnormal"] | df["has_trisomy8"]
         ).astype(int)
 
         df["is_missing_cytogenetics"] = df["CYTOGENETICS"].isna().astype(int)
@@ -95,6 +92,8 @@ class ClinicalDataFeatures:
             ),
             axis=1,
         )
+
+        df.drop(columns=["total_cell_count"], inplace = True)
 
         df["abnormal_cell_fraction_bin"] = pd.cut(
             df["abnormal_cell_proportion"],
