@@ -6,6 +6,7 @@ scikit-survival
 tqdm
 scipy
 joblib
+torch
 lifelines
 seaborn
 jinja2
